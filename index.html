@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
   <title>OneDrive Explorer Sample</title>
-  <link rel="stylesheet" type="text/css" href="style.css"/>
+  <link rel="stylesheet" type="text/css" href="./style.css" />
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-  <script id="odauth" src="odauth.js"></script>
   <link rel="icon" href="https://d.sfx-df.ms/images/favicon.ico" type="image/x-icon">
   <link rel="mask-icon" href="https://d.sfx-df.ms/images/mask_icon.svg" color="#094AB2">
   <script>
-    function signInToOneDrive()
-    {
-      // Register your own application at https://apps.dev.microsoft.com
+    function signInToOneDrive() {
+      // Register your own application at https://portal.azure.com
       // and set the "clientId" and "redirectUri" variables accordingly.
       var appInfo = {
-        "clientId": "e9a57c07-69e4-41f5-b868-0f123d2fda17",
-        "redirectUri": "http://localhost:9999/callback.html",
+        "clientId": "YOUR_CLIENT_ID",
+        "redirectUri": "http://localhost:3000/callback.html",
         "scopes": "user.read files.read files.read.all sites.read.all",
         "authServiceUri": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
       };
@@ -23,15 +22,14 @@
       // use Microsoft Graph v1.0
       var baseUrl = getQueryVariable("baseUrl")
       msGraphApiRoot = (baseUrl) ? baseUrl : "https://graph.microsoft.com/v1.0/me";
-      
+
       challengeForAuth();
 
-      saveToCookie( { "apiRoot": msGraphApiRoot, "signedin": true } );
+      saveToCookie({ "apiRoot": msGraphApiRoot, "signedin": true });
       return false;
     }
 
-    function showCustomLoginButton(show)
-    {
+    function showCustomLoginButton(show) {
       var loginButton = document.getElementById("od-login");
       loginButton.style.display = show ? "block" : "none";
 
@@ -39,28 +37,27 @@
       logoutButton.style.display = show ? "none" : "block";
     }
 
-    function getUrlParts(url)
-    {
+    function getUrlParts(url) {
       var a = document.createElement("a");
       a.href = url;
 
-      return { "hostname": a.hostname,
-               "path": a.pathname }
+      return {
+        "hostname": a.hostname,
+        "path": a.pathname
+      }
     }
 
-    function setOneDriveTitle(title)
-    {
-        var element = document.getElementById("od-site");
-        element.innerText = title;
+    function setOneDriveTitle(title) {
+      var element = document.getElementById("od-site");
+      element.innerText = title;
     }
 
 
-    function saveToCookie(obj)
-    {
+    function saveToCookie(obj) {
       var expiration = new Date();
       expiration.setTime(expiration.getTime() + 3600 * 1000);
       var data = JSON.stringify(obj);
-      var cookie = "odexplorer=" + data +"; path=/; expires=" + expiration.toUTCString();
+      var cookie = "odexplorer=" + data + "; path=/; expires=" + expiration.toUTCString();
 
       if (document.location.protocol.toLowerCase() == "https") {
         cookie = cookie + ";secure";
@@ -68,8 +65,7 @@
       document.cookie = cookie;
     }
 
-    function loadFromCookie()
-    {
+    function loadFromCookie() {
       var cookies = document.cookie;
       var name = "odexplorer=";
       var start = cookies.indexOf(name);
@@ -90,28 +86,27 @@
       return "";
     }
 
-    function signOut()
-    {
+    function signOut() {
       logoutOfAuth();
-      saveToCookie( { "apiRoot": msGraphApiRoot, "signedin": false } );
+      saveToCookie({ "apiRoot": msGraphApiRoot, "signedin": false });
       $('#od-breadcrumb').empty();
       $('#od-items').empty();
       $('#od-json').empty();
       location.reload();
     }
 
-    function getQueryVariable(variable)
-    {
-       var query = window.location.search.substring(1);
-       var vars = query.split("&");
-       for (var i=0;i<vars.length;i++) {
-               var pair = vars[i].split("=");
-               if(pair[0] == variable){return pair[1];}
-       }
-       return(false);
-     }
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) { return pair[1]; }
+      }
+      return (false);
+    }
   </script>
 </head>
+
 <body>
   <div id="od-site">
     <div id="od-commands">
@@ -124,20 +119,20 @@
     </div>
     <div id="od-title">OneDrive Explorer Sample - JS</div>
   </div>
-  
+
   <div id="od-loading"></div>
   <div id="od-breadcrumb"></div>
   <div id="od-content">
     <div id="od-items" class="od-pagecol"></div>
     <div id="od-json" class="od-pagecol"></div>
   </div>
+  <script type="text/javascript" src="./odauth.js"></script>
   <script>
     var baseUrl = getQueryVariable("baseUrl")
     msGraphApiRoot = (baseUrl) ? baseUrl : "https://graph.microsoft.com/v1.0/me";
 
     var data = loadFromCookie();
-    if (data)
-    {
+    if (data) {
       if (!baseUrl)
         msGraphApiRoot = data.apiRoot;
       showCustomLoginButton(!data.signedin)
@@ -156,20 +151,20 @@
     // this handler needs to call odauth in non-click mode since it doesn't
     // know why the hash changed.
     var loadedForHash = "";
-    $(window).bind('hashchange', function() {
+    $(window).bind('hashchange', function () {
       if (window.location.hash != loadedForHash) {
         loadedForHash = window.location.hash;
         odauth();
       }
 
-     return false;
+      return false;
     });
 
     // we bind to jquery's ajax start/stop events so that we can style the
     // page differently when a network call is being made
     $(document).on({
-      ajaxStart: function() {$('body').addClass('loading');},
-      ajaxStop:  function() {$('body').removeClass('loading');}
+      ajaxStart: function () { $('body').addClass('loading'); },
+      ajaxStop: function () { $('body').removeClass('loading'); }
     });
 
     // based on http://jsfiddle.net/KJQ9K/554/
@@ -200,7 +195,7 @@
       $('#od-breadcrumb').empty();
       var runningPath = '';
       var segments = path.split('/');
-      for (var i = 0 ; i < segments.length; i++) {
+      for (var i = 0; i < segments.length; i++) {
         if (i > 0) {
           $('<span>').text(' > ').appendTo("#od-breadcrumb");
         }
@@ -214,7 +209,7 @@
 
         $('<a>').
           attr("href", "#" + runningPath).
-          click(function() {
+          click(function () {
             // when the page changes in response to a user click,
             // we set loadedForHash to the new value and call
             // odauth ourselves in user-click mode. this causes
@@ -238,7 +233,7 @@
           authWindow.close();
         }
 
-        (function($){
+        (function ($) {
           // we extract the onedrive path from the url fragment and we
           // flank it with colons to use the api's path-based addressing scheme
           var path = "";
@@ -246,7 +241,7 @@
           var afterPath = "";
           if (window.location.hash.length > 1) {
             path = window.location.hash.substr(1);
-            beforePath =":";
+            beforePath = ":";
             afterPath = ":";
           }
 
@@ -264,7 +259,7 @@
             dataType: 'json',
             headers: { "Authorization": "Bearer " + token },
             accept: "application/json;odata.metadata=none",
-            success: function(data) {
+            success: function (data) {
               if (data) {
                 // clear out the old content
                 $('#od-items').empty();
@@ -281,15 +276,15 @@
                 // they'll be in an array called 'data'
                 var decodedPath = decodeURIComponent(path);
                 document.title = "OneDrive Explorer" + ((decodedPath.length > 0) ? " - " + decodedPath : "");
-                  
+
                 updateBreadcrumb(decodedPath);
                 var children = data.children || data.value;
                 if (children && children.length > 0) {
-                  $.each(children, function(i,item) {
+                  $.each(children, function (i, item) {
                     var tile = $("<div>").
                       attr("href", "#" + path + "/" + encodeURIComponent(item.name)).
                       addClass("item").
-                      click(function() {
+                      click(function () {
                         // when the page changes in response to a user click,
                         // we set loadedForHash to the new value and call
                         // odauth ourselves in user-click mode. this causes
@@ -331,7 +326,7 @@
 
                   var downloadUrl = data['@microsoft.graph.downloadUrl'];
                   if (downloadUrl) {
-                    tile.click(function(){window.open(downloadUrl, "Download");});
+                    tile.click(function () { window.open(downloadUrl, "Download"); });
                   }
 
                   if (data.folder) {
@@ -345,7 +340,7 @@
                   }
                 }
                 else {
-                  $('<p>No items in this folder.</p>').appendTo('#od-items');  
+                  $('<p>No items in this folder.</p>').appendTo('#od-items');
                 }
               } else {
                 $('#od-items').empty();
@@ -367,4 +362,5 @@
     odauth();
   </script>
 </body>
+
 </html>
